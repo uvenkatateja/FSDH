@@ -77,8 +77,7 @@ export async function generateSixQuestions() {
 
     const response = completion.choices[0]?.message?.content;
     if (response) {
-      console.log('📝 AI Response received:', response.substring(0, 200) + '...');
-      const parsed = cleanAndParseJSON(response);
+        const parsed = cleanAndParseJSON(response);
       if (parsed && Array.isArray(parsed) && parsed.length >= 6) {
         // Add UUIDs if not present and ensure proper format
         const questions = parsed.slice(0, 6).map(q => ({
@@ -111,7 +110,6 @@ export async function generateQuestionsFromResume(resumeText: string) {
     throw new Error('Groq API key is required. Please add VITE_GROQ_API_KEY to your .env file.');
   }
 
-  console.log('🤖 Generating AI questions from resume...', resumeText.substring(0, 100) + '...');
 
   try {
     // Extract key technologies and experience from resume for better targeting
@@ -154,7 +152,6 @@ Focus questions on their actual experience with these technologies. Make expecte
 
     const response = completion.choices[0]?.message?.content;
     if (response) {
-      console.log('📝 AI Response received:', response.substring(0, 200) + '...');
       const parsed = cleanAndParseJSON(response);
       if (parsed && Array.isArray(parsed) && parsed.length >= 6) {
         // Add UUIDs if not present and ensure proper format
@@ -252,7 +249,6 @@ function keywordBasedScoring(_question: string, answer: string, expectedPoints: 
   const answerLower = answer.toLowerCase();
   const wordCount = answer.trim().split(/\s+/).length;
 
-  console.log('📝 Answer analysis:', { wordCount, answerPreview: answer.substring(0, 100) });
 
   // Base score for providing an answer
   let score = 2; // Start with 2 points for attempting to answer
@@ -303,14 +299,6 @@ function keywordBasedScoring(_question: string, answer: string, expectedPoints: 
   // Clamp to valid range
   const finalScore = clampScore(Math.round(score));
 
-  console.log('🎯 Final keyword scoring:', {
-    baseScore: 2,
-    expectedMatches,
-    technicalMatches: technicalMatches.length,
-    wordCount,
-    rawScore: score.toFixed(1),
-    finalScore
-  });
 
   // Generate feedback based on score
   let feedback = '';
@@ -336,13 +324,6 @@ export async function evaluateAnswer(
     difficulty: string,
     expectedPoints: string[] = []
   ) {
-    console.log('🔍 Starting evaluation with:', {
-      question: question.substring(0, 100),
-      answer: answer.substring(0, 100),
-      difficulty,
-      expectedPoints,
-      answerLength: answer?.length || 0
-    });
 
     // If answer is empty, return 0 immediately
     if (!answer || !answer.trim()) {
@@ -450,21 +431,15 @@ Evaluate the answer quality, technical accuracy, and coverage of expected points
 
 // Calculate weighted final score with improved logic
 export function calculateFinalScore(questions: any[]): { finalScore: number; rawScore: number } {
-  console.log('📊 Calculating final score for questions:', questions.map(q => ({
-    difficulty: q.difficulty,
-    score: q.score,
-    hasAnswer: !!q.answerText
-  })));
 
   let weightedSum = 0;
   let maxPossible = 0;
   let validQuestions = 0;
 
-  questions.forEach((q, index) => {
+  questions.forEach((q) => {
     const weight = DIFFICULTY_WEIGHTS[q.difficulty as keyof typeof DIFFICULTY_WEIGHTS] || 1;
     const score = clampScore(q.score || 0);
 
-    console.log(`Question ${index + 1} (${q.difficulty}): score=${score}, weight=${weight}`);
 
     weightedSum += score * weight;
     maxPossible += 10 * weight;
@@ -480,25 +455,12 @@ export function calculateFinalScore(questions: any[]): { finalScore: number; raw
   // Convert to percentage (0-100)
   const finalScore = Math.max(0, Math.round(rawScore * 100));
 
-  console.log('📊 Final Score Calculation:', {
-    totalQuestions: questions.length,
-    validQuestions,
-    weightedSum: weightedSum.toFixed(1),
-    maxPossible,
-    rawScore: rawScore.toFixed(3),
-    finalScore
-  });
 
   return { finalScore, rawScore };
 }
 
 // Generate final summary with improved analysis
 export async function generateFinalSummary(questions: any[]) {
-  console.log('📊 Generating final summary for questions:', questions.map(q => ({
-    difficulty: q.difficulty,
-    score: q.score,
-    hasAnswer: !!q.answerText
-  })));
 
   // Calculate weighted score
   const { finalScore } = calculateFinalScore(questions);
