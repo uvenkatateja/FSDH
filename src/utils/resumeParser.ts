@@ -1,8 +1,14 @@
 import mammoth from 'mammoth';
 import Groq from 'groq-sdk';
 import pdfToText from 'react-pdftotext';
+import { validateGroqApiKey } from './apiKeyValidator';
 
-// Initialize Groq client
+// Validate API key and initialize Groq client
+const apiKeyValidation = validateGroqApiKey();
+if (!apiKeyValidation.isValid && import.meta.env.DEV) {
+  console.warn('⚠️ Resume Parser - Groq API Key Issue:', apiKeyValidation.error);
+}
+
 const groq = new Groq({
   apiKey: import.meta.env.VITE_GROQ_API_KEY,
   dangerouslyAllowBrowser: true,

@@ -1,5 +1,13 @@
 import Groq from 'groq-sdk';
 import { v4 as uuidv4 } from 'uuid';
+import { validateGroqApiKey } from './apiKeyValidator';
+
+// Validate API key on module load
+const apiKeyValidation = validateGroqApiKey();
+if (!apiKeyValidation.isValid && import.meta.env.DEV) {
+  console.warn('⚠️ Groq API Key Issue:', apiKeyValidation.error);
+  console.info('💡 Suggestion:', apiKeyValidation.suggestion);
+}
 
 const groq = new Groq({
   apiKey: import.meta.env.VITE_GROQ_API_KEY,

@@ -12,7 +12,8 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['pdfjs-dist', 'pdf-parse']
+    exclude: ['pdfjs-dist', 'pdf-parse'],
+    include: ['groq-sdk', 'mammoth', 'react-pdftotext']
   },
   define: {
     global: 'globalThis',
@@ -20,6 +21,22 @@ export default defineConfig({
   build: {
     rollupOptions: {
       external: [],
+      output: {
+        manualChunks: {
+          'pdf-worker': ['pdfjs-dist'],
+          'groq': ['groq-sdk'],
+          'resume-parser': ['mammoth', 'react-pdftotext']
+        }
+      }
     },
+    target: 'esnext',
+    sourcemap: false,
+    chunkSizeWarningLimit: 1000
   },
+  server: {
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'credentialless',
+      'Cross-Origin-Opener-Policy': 'same-origin'
+    }
+  }
 })

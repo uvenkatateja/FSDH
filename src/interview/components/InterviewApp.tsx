@@ -2,22 +2,22 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { setWelcomeBack } from '../../store/interviewSlice';
-import IntervieweeTab from './IntervieweeTab';
-import InterviewerTab from './InterviewerTab';
+import IntervieweeTab from '../../components/Interview/IntervieweeTab';
+import InterviewerTab from '../../components/Interview/InterviewerTab';
 import WelcomeBackModal from '../../components/WelcomeBackModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 
 const InterviewApp = () => {
   const [activeTab, setActiveTab] = useState('interviewee');
   const dispatch = useDispatch();
-  const { showWelcomeBack, currentCandidateId, isActive } = useSelector((state: RootState) => state.interview);
+  const { showWelcomeBack, candidateId: currentCandidateId, status } = useSelector((state: RootState) => state.currentInterview);
 
   useEffect(() => {
     // Check if there's an unfinished interview on app load
-    if (currentCandidateId && isActive) {
+    if (currentCandidateId && status === 'in-progress') {
       dispatch(setWelcomeBack(true));
     }
-  }, [currentCandidateId, isActive, dispatch]);
+  }, [currentCandidateId, status, dispatch]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -56,7 +56,7 @@ const InterviewApp = () => {
         </Tabs>
       </main>
 
-      {showWelcomeBack && <WelcomeBackModal />}
+      {showWelcomeBack && <WelcomeBackModal onResume={() => dispatch(setWelcomeBack(false))} />}
     </div>
   );
 };
